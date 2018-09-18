@@ -1,15 +1,35 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Sep 16 16:46:39 2018
+Created on Mon Sep 17 21:07:16 2018
 
 @author: Ozan Gokdemir
 """
 
-import numpy as np
+#a function to read the csv, generate lists of movies for each user. 
 
-database = [frozenset([1, 3, 4]),frozenset ([2, 3, 5]), frozenset([1, 2, 3, 5]), frozenset([2, 5])]
+import csv 
 
-supportCache = {}
+def read_and_process_file(filepath):
+    with open(filepath, newline='') as csvfile:
+        reader = csv.reader(csvfile)
+        current_users_movie_list = []
+        database = []
+        current_user = 0
+        for row in reader:
+            if row[0] == current_user:
+                current_users_movie_list.append(row[1])
+            else:
+                database.append(current_users_movie_list)
+                current_user = row[0]
+                current_users_movie_list = [row[1]]
+                
+         
+    del database[0:2]
+    return list(map(frozenset,database))
+    
+data = read_and_process_file('C:\\Users\\Ozan Gokdemir\\Desktop\\DataMining2018\\A1\\data\\sorted.csv')
+          
+    
 
 #finds the single item candidates in the dataset. 
 def findCandidates1(dataset):
@@ -27,6 +47,18 @@ def findCandidates1(dataset):
 #print(findCandidates1(database))
 
 
+#an attempt to optimize the the algorithm. 
+#idea is that a transaction that does not contain any frequent k-itemset is useless in subsequent scans.
+def transaction_reduction(frequentItemsets, dataset):
+    for trans in dataset:
+        count = 0 
+        for freqSet in frequentItemsets:
+            if freqSet.issubset(trans):
+                count+=1 
+        if count == 0:
+            dataset.remove(trans)
+
+
 #filters the candidates that satisfy the support requirement, keeps the valid ones and dumps the rest. 
 def findFrequentItemsets(dataset, supCriteria):
     frequentItemsets = [] #stores only the candidates that satisy the support threshold. 
@@ -36,7 +68,8 @@ def findFrequentItemsets(dataset, supCriteria):
         for c in cands: 
             if support(c, dataset) >= supCriteria:
                 temp.append(frozenset(c))
-                frequentItemsets.append(c)                
+                frequentItemsets.append(c)             
+        transaction_reduction(frequentItemsets, dataset)
         cands = []
         
         for t in temp:
@@ -47,9 +80,12 @@ def findFrequentItemsets(dataset, supCriteria):
     return frequentItemsets
 
 
+
+
 #print(filterCandidates(findCandidates1(database), database, 0.5))
 
 
+supportCache = {}
 
 def support(itemset, dataset):
     
@@ -63,7 +99,6 @@ def support(itemset, dataset):
         
         supportCache[itemset] = countOfAppearance
         return countOfAppearance
-    
 
 def confidence(precedent, antecedent, database):  
     testset = precedent.union(antecedent)
@@ -81,17 +116,10 @@ def findRules(database, minConfidence):
                 if(len(f) <= len(frequentItems[u])):
                     rules.append((f , frequentItems[u]))
     return rules
-        
-        
-database2 = (frozenset([1,2,3]), frozenset([2,3]), frozenset([4,5]), frozenset([1,2]), frozenset([1,5]))
-#out = findFrequentItemsets(database2, 2)
-#print(out) #should print something containing sets {1},{2},{3},{5},{1,2}, and {2,3}.
+    
 
-#Should print something like {2} ===> {1,2}, {1} ===> {1,2}, {3} ===> {2,3}, and {2} === {2,3}
-rules = list(findRules(database2, 0.5))
+rules = list(findRules(data, 0.5))
 for r in rules:
     print(str(r[0]) + " ===> " + str(r[1]))
-
-
-
-#print(findRules(database, 0.75))
+    
+    
