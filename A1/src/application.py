@@ -10,7 +10,7 @@ Created on Mon Sep 17 21:07:16 2018
 import csv 
 
 def read_and_process_file(filepath):
-    with open(filepath, newline='') as csvfile:
+    with open(filepath) as csvfile:
         reader = csv.reader(csvfile)
         current_users_movie_list = []
         database = []
@@ -121,15 +121,77 @@ firstCandidates = findCandidates1(dat)
 
 print("k1 candidates calculated, number is "+ str(len(firstCandidates)))
 
-frequentItemsets = findFrequentItemsets(firstCandidates, dat, 170)
+frequentItemsets = findFrequentItemsets(firstCandidates, dat, 100)
 
 print("frequent itemsets calculated, number is "+ str(len(frequentItemsets)))
 
-rules = findRules(frequentItemsets, dat, 0.95)
+rules = findRules(frequentItemsets, dat, 0.97)
+
+
+
+
+
+import re
+
+filepath = "C:\\Users\\Ozan Gokdemir\\Desktop\\introdm\\A1\\data\\movielisting.txt"
+
+
+
+#This helper function reads and processes the raw movielisting.txt file.
+#It is used in converting the movieIds in the rules to the movie names.
+#param: path in which the movielisting file resides. PLEASE PASS THE DIRECTORY ON YOUR COMPUTER.
+#returns: a dictionary mapping the movieId to the movie name. 
+def processRawMovieNameList(filepath):
+    
+    file = open(filepath, "r")
+
+    raw_text = file.read()
+
+    namesList = {}
+
+    splitList = raw_text.splitlines()
+    
+    for row in splitList: 
+        movie = row.split(" ")
+        for i in movie:
+            if("(" in i):
+                idx = movie.index(i)
+                movName=""
+                for j in range(1,idx):
+                    movName+=(movie[j]+" ")
+                    namesList[movie[0]] = movName
+    return namesList
+          
+            
+def convertIdsToNamesInRules(dictionaryMapping, rulesString):
+  
+    for key in dictionaryMapping:
+        rulesString = rulesString.replace(key, dictionaryMapping[key]+", ")
+    return rulesString
+
+  #convertedRules = {}
+    #temp = set([])
+    
+    '''
+    for ruleKey in rules.keys:
+        for movieId in ruleKey:
+            temp.append(dictionaryMapping[movieId])
+        convertedRules[(frozenset(temp)] = 
+    '''
+
+mapping = processRawMovieNameList(filepath)
+
 
 
 for r in rules.keys():
     temp = list(r)
-    print(str(temp[0]) + "===>" + str(temp[1]) + " with confidence= " + str(rules[r])+"\n")
-
+    print(convertIdsToNamesInRules(
+            mapping, str(temp[0]) + "===>" + str(temp[1])) + " with confidence= " + str(rules[r]))
+    
+    
+    print(" ")
+    print(" ")
 print("rules calculated number is "+ str(len(rules)))
+
+
+
