@@ -133,7 +133,7 @@ rules = findRules(frequentItemsets, dat, 0.97)
 
 import re
 
-filepath = "C:\\Users\\Ozan Gokdemir\\Desktop\\introdm\\A1\\data\\movielisting.txt"
+filepath = "C:\\Users\\Ozan Gokdemir\\Desktop\\DataMining2018\\A1\\data\\movielisting.txt"
 
 
 
