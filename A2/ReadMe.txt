@@ -1,10 +1,7 @@
-Data Mining and Machine Learning
+Please specify the location of the data folder on your computer. 
+You will find this field at the first line of each implementation. 
 
-Successful implementation of the K-Means Clustering algorithm. 
 
-Algorithm is ran on the delivery fleet data containing 4.000 rows.
-Each data point has 2 features.
+This is the line you should change in order to run the code. 
+df = pd.read_csv("C:\\Users\\Ozan Gokdemir\\Desktop\\ozan_rain_tom\\A2\\data\\dataset.csv")
 
-Ozan Gokdemir 
-
-10/6/2018
